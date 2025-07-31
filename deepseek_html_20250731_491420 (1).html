@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeonBot | WhatsApp Connection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #25D366;
+            --primary-dark: #128C7E;
+            --dark: #0F172A;
+            --darker: #020617;
+            --light: #F8FAFC;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #10B981;
+            --error: #EF4444;
+            --warning: #F59E0B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--darker);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.6;
+            padding: 1rem;
+            background-image: 
+                radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 0.1) 0px, transparent 50%);
+        }
+
+        .glass-card {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(37, 211, 102, 0.1) 0%, transparent 70%);
+            animation: rotate 15s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), #34D399);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .tagline {
+            opacity: 0.8;
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-label span {
+            opacity: 0.7;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .country-code {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            color: var(--light);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(37, 211, 102, 0.1);
+            box-shadow: none;
+        }
+
+        .code-display {
+            font-size: 2rem;
+            letter-spacing: 0.5rem;
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 0.75rem;
+            margin: 1.5rem 0;
+            font-weight: 700;
+            color: var(--primary);
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+
+        .status-card {
+            margin-top: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .status-connected {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-disconnected {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+
+        .status-loading {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .status-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .status-desc {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .status-details {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .detail-label {
+            opacity: 0.7;
+        }
+
+        .detail-value {
+            font-weight: 500;
+        }
+
+        .connected {
+            color: var(--success);
+        }
+
+        .disconnected {
+            color: var(--error);
+        }
+
+        .steps {
+            margin-top: 2rem;
+        }
+
+        .step {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            opacity: 0.9;
+            font-size: 0.95rem;
+            padding-top: 3px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .feature:hover {
+            background: rgba(37, 211, 102, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .feature-icon {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+        }
+
+        .feature-desc {
+            opacity: 0.7;
+            font-size: 0.8rem;
+        }
+
+        .social-channels {
+            margin-top: 2rem; 
+            text-align: center;
+        }
+
+        .social-channels h3 {
+            font-size: 1rem; 
+            margin-bottom: 1rem; 
+            opacity: 0.8;
+        }
+
+        .social-channels .channels-container {
+            display: flex; 
+            justify-content: center; 
+            gap: 1.5rem;
+        }
+
+        .social-channels a {
+            text-decoration: none; 
+            color: var(--light);
+        }
+
+        .social-channels .channel {
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+        }
+
+        .social-channels .channel-icon {
+            width: 50px; 
+            height: 50px; 
+            background: rgba(37, 211, 102, 0.2); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .social-channels .youtube-icon {
+            background: rgba(255, 0, 0, 0.2);
+        }
+
+        .social-channels .channel-name {
+            margin-top: 0.5rem; 
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .social-channels a:hover .channel-icon {
+            transform: translateY(-5px);
+        }
+
+        .social-channels a:hover .channel-name {
+            color: var(--primary);
+        }
+
+        @media (max-width: 480px) {
+            .glass-card {
+                padding: 1.75rem;
+            }
+            
+            .code-display {
+                font-size: 1.5rem;
+                padding: 1.25rem;
+            }
+
+            .social-channels .channels-container {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-card">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🤖</div>
+                <div class="logo-text">NeonBot</div>
+            </div>
+            <p class="tagline">Connect your WhatsApp to our powerful automation system</p>
+        </div>
+
+        <div class="input-group">
+            <label for="phone-number" class="input-label">
+                <span>WhatsApp Number</span>
+            </label>
+            <div class="input-wrapper">
+                <span class="country-code">+62</span>
+                <input 
+                    type="tel" 
+                    id="phone-number" 
+                    class="input-field" 
+                    placeholder="81234567890" 
+                    pattern="[0-9]{9,13}"
+                    required
+                >
+            </div>
+        </div>
+
+        <button id="generate-btn" class="btn">
+            <span>Generate Pairing Code</span>
+        </button>
+
+        <div id="code-display" class="code-display"></div>
+
+        <div id="status-card" class="status-card">
+            <div class="status-header">
+                <div id="status-icon" class="status-icon status-loading">
+                    ⏳
+                </div>
+                <div>
+                    <h3 id="status-title" class="status-title">Checking Status...</h3>
+                    <p id="status-desc" class="status-desc">Connecting to our servers</p>
+                </div>
+            </div>
+            
+            <div class="status-details">
+                <div class="detail-item">
+                    <span class="detail-label">Registered Number</span>
+                    <span id="registered-number" class="detail-value">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Connection</span>
+                    <span id="connection-status" class="detail-value">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Last Active</span>
+                    <span id="last-active" class="detail-value">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Active Session</span>
+                    <span id="active-session" class="detail-value">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    Click "Generate Pairing Code" above
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    Open WhatsApp on your phone > Settings > Linked Devices
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    Enter the 6-digit code shown here
+                </div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">💬</div>
+                <h3 class="feature-title">Auto Reply</h3>
+                <p class="feature-desc">Smart automated responses</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Analytics</h3>
+                <p class="feature-desc">Detailed message stats</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🤖</div>
+                <h3 class="feature-title">Multi-Device</h3>
+                <p class="feature-desc">Use from any device</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Secure</h3>
+                <p class="feature-desc">End-to-end encrypted</p>
+            </div>
+        </div>
+
+        <div class="social-channels">
+            <h3>Join Our Community</h3>
+            <div class="channels-container">
+                <a href="https://wa.me/6281234567890" target="_blank">
+                    <div class="channel">
+                        <div class="channel-icon">📱</div>
+                        <span class="channel-name">WhatsApp Group</span>
+                    </div>
+                </a>
+                <a href="https://youtube.com/c/NeonBot" target="_blank">
+                    <div class="channel">
+                        <div class="channel-icon youtube-icon">▶️</div>
+                        <span class="channel-name">YouTube</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Device database simulation
+        const deviceDatabase = {
+            "81234567890": {
+                status: "connected",
+                lastActive: "2 minutes ago",
+                activeSince: "Today, 14:30"
+            },
+            "89876543210": {
+                status: "disconnected",
+                lastActive: "1 hour ago",
+                activeSince: null
+            }
+        };
+
+        // Check device status
+        function checkDeviceStatus(phoneNumber) {
+            const statusCard = document.getElementById('status-card');
+            const statusIcon = document.getElementById('status-icon');
+            const statusTitle = document.getElementById('status-title');
+            const statusDesc = document.getElementById('status-desc');
+            const registeredNumber = document.getElementById('registered-number');
+            const connectionStatus = document.getElementById('connection-status');
+            const lastActive = document.getElementById('last-active');
+            const activeSession = document.getElementById('active-session');
+            
+            statusCard.style.display = 'block';
+            statusIcon.className = "status-icon status-loading";
+            statusIcon.innerHTML = "⏳";
+            statusTitle.textContent = "Checking Status...";
+            statusDesc.textContent = "Connecting to our servers";
+            
+            // Simulate API call
+            setTimeout(() => {
+                const device = deviceDatabase[phoneNumber] || null;
+                
+                registeredNumber.textContent = `+62${phoneNumber}`;
+                
+                if (device) {
+                    if (device.status === "connected") {
+                        statusIcon.className = "status-icon status-connected";
+                        statusIcon.innerHTML = "✓";
+                        statusTitle.textContent = "Connected";
+                        statusDesc.textContent = "Device is active and ready";
+                        connectionStatus.textContent = "Active";
+                        connectionStatus.className = "detail-value connected";
+                    } else {
+                        statusIcon.className = "status-icon status-disconnected";
+                        statusIcon.innerHTML = "✗";
+                        statusTitle.textContent = "Disconnected";
+                        statusDesc.textContent = "Device is not connected";
+                        connectionStatus.textContent = "Inactive";
+                        connectionStatus.className = "detail-value disconnected";
+                    }
+                    
+                    lastActive.textContent = device.lastActive;
+                    activeSession.textContent = device.activeSince || "-";
+                } else {
+                    statusIcon.className = "status-icon status-disconnected";
+                    statusIcon.innerHTML = "✗";
+                    statusTitle.textContent = "Not Registered";
+                    statusDesc.textContent = "This number hasn't been paired";
+                    connectionStatus.textContent = "Unknown";
+                    connectionStatus.className = "detail-value disconnected";
+                    lastActive.textContent = "-";
+                    activeSession.textContent = "-";
+                }
+            }, 1500);
+        }
+
+        // Generate pairing code
+        document.getElementById('generate-btn').addEventListener('click', function() {
+            let phoneNumber = document.getElementById('phone-number').value.trim();
+            
+            // Clean input (remove all non-digits)
+            phoneNumber = phoneNumber.replace(/\D/g, '');
+            
+            // Validation
+            if (phoneNumber.length < 9 || phoneNumber.length > 13) {
+                alert("Phone number must be between 9-13 digits!\nExample: 81234567890");
+                return;
+            }
+            
+            // Generate 6-digit code
+            const code = Math.floor(100000 + Math.random() * 900000);
+            
+            // Display code
+            const codeDisplay = document.getElementById('code-display');
+            codeDisplay.textContent = code;
+            codeDisplay.style.display = 'block';
+            
+            // Check device status
+            checkDeviceStatus(phoneNumber);
+            
+            // Simulate successful pairing after 10 seconds
+            setTimeout(() => {
+                alert(`Successfully paired with +62${phoneNumber}!`);
+                
+                // Update status to connected
+                const statusIcon = document.getElementById('status-icon');
+                const statusTitle = document.getElementById('status-title');
+                const statusDesc = document.getElementById('status-desc');
+                const connectionStatus = document.getElementById('connection-status');
+                
+                statusIcon.className = "status-icon status-connected";
+                statusIcon.innerHTML = "✓";
+                statusTitle.textContent = "Connected";
+                statusDesc.textContent = "Device is active and ready";
+                connectionStatus.textContent = "Active";
+                connectionStatus.className = "detail-value connected";
+                
+                // Update last active time
+                document.getElementById('last-active').textContent = "Just now";
+                document.getElementById('active-session').textContent = new Date().toLocaleString();
+                
+            }, 10000);
+        });
+
+        // Check status when typing
+        document.getElementById('phone-number').addEventListener('input', function(e) {
+            let phoneNumber = e.target.value.trim().replace(/\D/g, '');
+            if (phoneNumber.length >= 3) {
+                checkDeviceStatus(phoneNumber);
+            }
+        });
+    </script>
+</body>
+</html>
